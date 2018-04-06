@@ -70,9 +70,6 @@ class CreateNewAuthorViewController: UIViewController {
     }
     
     @objc func saveBtnOnTap() {
-        guard let selectedIndex = self.selectedAuthorIndex, let selectedBook = self.selectedBook else {
-            return
-        }
         if self.type == .Save {
             if self.isFromExistingAuthor == false {
                 let obj = Author.saveDetails(name: self.authorNameTextField.text!, age: Int16(self.authorAgeTextField.text!)!, native: self.authorNativeTextField.text!, about: self.authorAboutTextView.text, bookObj: self.selectedBook!)
@@ -81,8 +78,10 @@ class CreateNewAuthorViewController: UIViewController {
                 }
             }
             else {
-                Author.linkExistingAuthorWithBook(book: selectedBook, autherId: self.authors[selectedIndex].objectID)
-                self.navigationController?.popToRootViewController(animated: true)
+                if let selectedIndex = self.selectedAuthorIndex {
+                    Author.linkExistingAuthorWithBook(book: self.selectedBook!, autherId: self.authors[selectedIndex].objectID)
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
             }
         }
         else {
