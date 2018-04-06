@@ -20,6 +20,7 @@ class CreateNewAuthorViewController: UIViewController {
     var selectedBook : Books?
     var objId = NSManagedObjectID()
     var isFromExistingAuthor = Bool()
+    var selectedAuthorIndex : Int?
     var authors = [Author]()
     
     enum controlType {
@@ -69,14 +70,23 @@ class CreateNewAuthorViewController: UIViewController {
     }
     
     @objc func saveBtnOnTap() {
+        guard let selectedIndex = self.selectedAuthorIndex, let selectedBook = self.selectedBook else {
+            return
+        }
         if self.type == .Save {
-            let obj = Author.saveDetails(name: self.authorNameTextField.text!, age: Int16(self.authorAgeTextField.text!)!, native: self.authorNativeTextField.text!, about: self.authorAboutTextView.text, bookObj: self.selectedBook!)
-            if obj != nil {
+            if self.isFromExistingAuthor == false {
+                let obj = Author.saveDetails(name: self.authorNameTextField.text!, age: Int16(self.authorAgeTextField.text!)!, native: self.authorNativeTextField.text!, about: self.authorAboutTextView.text, bookObj: self.selectedBook!)
+                if obj != nil {
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+            }
+            else {
+                Author.linkExistingAuthorWithBook(book: selectedBook, autherId: self.authors[selectedIndex].objectID)
                 self.navigationController?.popToRootViewController(animated: true)
             }
         }
         else {
-            let isUpdate = Author.updateContent(name: self.authorNameTextField.text!, age: Int16(self.authorAgeTextField.text!)!, aboutAuthor: self.authorAboutTextView.text!, native: self.authorNativeTextField.text!, updatedAuthorObj: self.objId)
+            let isUpdate = Author.updateContent(name: self.authorNameTextField.text!, age: Int16(self.authorAgeTextField.text!)!, aboutAuthor: self.authorAboutTextView.text!, native: self.authorNativeTextField.text!, updatedAuthorObj: self.authors[selectedIndex].objectID)
             if isUpdate == true {
                 self.showAlert(msg: "Updated Successfully", title: "Success")
             }
@@ -114,6 +124,7 @@ class CreateNewAuthorViewController: UIViewController {
     }
 }
 
+
 extension CreateNewAuthorViewController : UIPickerViewDataSource, UIPickerViewDelegate {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -131,6 +142,10 @@ extension CreateNewAuthorViewController : UIPickerViewDataSource, UIPickerViewDe
         self.authorPicker.isHidden = true
         self.authorNameTextField.isHidden = false
         self.authorNameTextField.text = self.authors[row].name
+        self.authorAgeTextField.text = String(self.authors[row].age)
+        self.authorNativeTextField.text = self.authors[row].native
+        self.authorAboutTextView.text = self.authors[row].aboutAuthor
+        self.selectedAuthorIndex = row // change
         self.authorNameTextField.isUserInteractionEnabled = false
     }
     

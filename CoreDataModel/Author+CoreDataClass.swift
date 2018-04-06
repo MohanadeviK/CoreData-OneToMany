@@ -37,6 +37,27 @@ public class Author: NSManagedObject {
         return authorObj
     }
     
+    // chage
+    class func linkExistingAuthorWithBook(book:Books, autherId : NSManagedObjectID)
+    {
+        let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let author = managedContext.object(with: autherId)
+        
+        let authorObj = author as! Author
+        authorObj.addToBooks(book)
+        
+        do {
+            try managedContext.save()
+            //            return authorObj
+        }
+        catch let error as NSError
+        {
+            print("Could not link \(error), \(error.userInfo)")
+            //            return nil
+        }
+        
+    }
+    
     class func updateContent(name : String, age : Int16, aboutAuthor : String, native: String, updatedAuthorObj : NSManagedObjectID) -> Bool
     {
         let managedContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -100,9 +121,14 @@ public class Author: NSManagedObject {
         let predicate = NSPredicate(format: "name = %@", authorName)
         fetchRequest.predicate = predicate
         do {
-            let results =
-                try managedContext.fetch(fetchRequest) as? [Author]
-            return (results?.count)!
+            //Change
+            if let authorsData =
+                try managedContext.fetch(fetchRequest) as? [Author], authorsData.count > 0
+            {
+                return authorsData.first?.books?.count
+            }
+            
+            return 0
         }
         catch let error as NSError
         {
