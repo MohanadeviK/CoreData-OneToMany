@@ -85,9 +85,11 @@ class CreateNewAuthorViewController: UIViewController {
             }
         }
         else {
-            let isUpdate = Author.updateContent(name: self.authorNameTextField.text!, age: Int16(self.authorAgeTextField.text!)!, aboutAuthor: self.authorAboutTextView.text!, native: self.authorNativeTextField.text!, updatedAuthorObj: self.authors[selectedIndex].objectID)
-            if isUpdate == true {
-                self.showAlert(msg: "Updated Successfully", title: "Success")
+            if let selectedIndex = self.selectedAuthorIndex {
+                let isUpdate = Author.updateContent(name: self.authorNameTextField.text!, age: Int16(self.authorAgeTextField.text!)!, aboutAuthor: self.authorAboutTextView.text!, native: self.authorNativeTextField.text!, updatedAuthorObj: self.authors[selectedIndex].objectID)
+                if isUpdate == true {
+                    self.showAlert(msg: "Updated Successfully", title: "Success")
+                }
             }
         }
     }
